@@ -1,0 +1,5 @@
+# Ignora o executável compilado
+programa_farmacia
+
+# Ignora os arquivos de dados .bin gerados pelo programa
+*.bin
