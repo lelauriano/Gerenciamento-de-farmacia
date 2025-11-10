@@ -46,24 +46,31 @@ void cadastrarFuncionario(FILE* fp) {
     }
 
     printf("\t\tCADASTRO DE FUNCIONARIO\n\n");
+
     printf("Digite o ID:\n");
     scanf("%d", &func.id);
-    getchar();
+    getchar();                                  //Limpa o buffer do scanf
+
     printf("Digite o nome:\n");
     fgets(func.nome, 50, stdin);
-    func.nome[strcspn(func.nome, "\n")] = 0;
+    func.nome[strcspn(func.nome, "\n")] = 0;    //Limpa o buffer do fgets
+
     printf("Digite o CPF:\n");
     fgets(func.cpf, 50, stdin);
     func.cpf[strcspn(func.cpf, "\n")] = 0;
+
     printf("Digite o salario:\n");
     scanf("%f", &func.salario);
     getchar();
+
     printf("Digite o endereco:\n");
     fgets(func.endereco, 50, stdin);
     func.endereco[strcspn(func.endereco, "\n")] = 0;
+
     printf("Digite o telefone:\n");
     fgets(func.telefone, 50, stdin);
     func.telefone[strcspn(func.telefone, "\n")] = 0;
+
     printf("Digite o e-mail:\n");
     fgets(func.email, 50, stdin);
     func.email[strcspn(func.email, "\n")] = 0;
@@ -83,18 +90,23 @@ void cadastrarCliente(FILE* fp) {
     }
 
     printf("\t\tCADASTRO DE CLIENTE\n\n");
+
     printf("Digite o ID:\n");
     scanf("%d", &cli.id);
     getchar();
+
     printf("Digite o nome:\n");
     fgets(cli.nome, 50, stdin);
     cli.nome[strcspn(cli.nome, "\n")] = 0;
+
     printf("Digite o CPF:\n");
     fgets(cli.cpf, 14, stdin);
     cli.cpf[strcspn(cli.cpf, "\n")] = 0;
+
     printf("Digite o telefone:\n");
     fgets(cli.telefone, 50, stdin);
     cli.telefone[strcspn(cli.telefone, "\n")] = 0;
+
     printf("Digite a(s) alergia(s):\n");
     fgets(cli.alergias, 80, stdin);
     cli.alergias[strcspn(cli.alergias, "\n")] = 0;
@@ -114,21 +126,27 @@ void cadastrarMedicamento(FILE* fp) {
     }
 
     printf("\t\tCADASTRO DE MEDICAMENTO\n\n");
+
     printf("Digite o ID:\n");
     scanf("%d", &med.id);
     getchar();
+
     printf("Digite o nome:\n");
     fgets(med.nome, 30, stdin);
     med.nome[strcspn(med.nome, "\n")] = 0;
+
     printf("Digite o fabricante:\n");
     fgets(med.fabricante, 30, stdin);
     med.fabricante[strcspn(med.fabricante, "\n")] = 0;
+
     printf("Digite a dosagem:\n");
     scanf("%f", &med.dosagem);
     getchar();
+
     printf("Digite o preco:\n");
     scanf("%f", &med.preco);
     getchar();
+
     printf("Digite a quantidade\n");
     scanf("%d", &med.quantidade);
     getchar();
@@ -149,15 +167,19 @@ void registrarVendas(FILE* fp) {
     }
 
     printf("\t\tREGISTRO DE VENDAS\n\n");
+
     printf("Digite o ID do cliente:\n");
     scanf("%d", &ven.idCliente);
     getchar();
+
     printf("Digite o ID do medicamento:\n");
     scanf("%d", &ven.idMed);
     getchar();
+
     printf("Digite a quantidade vendida:\n");
     scanf("%d", &ven.quantidade);
     getchar();
+    
     printf("Digite o valor total:\n");
     scanf("%f", &ven.valorTotal);
 
@@ -171,7 +193,7 @@ void registrarVendas(FILE* fp) {
     FILE* ptrTemp;
     ptrTemp = fopen("temp.bin", "wb");
     if(ptrTemp == NULL) {
-        printf("Erro ao abrir arquivo temporario\n");
+        printf("Erro ao abrir arquivo temporario\n\n");
         return;
     }
 
@@ -179,7 +201,7 @@ void registrarVendas(FILE* fp) {
     while (fread(&med, sizeof(med), 1, ptrMed) == 1) {
         if (med.id == ven.idMed) {
             if (med.quantidade >= ven.quantidade) {
-                med.quantidade = med.quantidade - ven.quantidade;
+                med.quantidade = med.quantidade - ven.quantidade; //Atualiza a quantidade de medicamentos em estoque
                 encontrado = 1;
             }
             else {
@@ -187,13 +209,13 @@ void registrarVendas(FILE* fp) {
                 return;
             }
         }
-        fwrite(&med, sizeof(med), 1, ptrTemp);
+        fwrite(&med, sizeof(med), 1, ptrTemp); //Copia os dados do arquivo principal para o temporário com a quantidade de medicamentos atualizada
     }
 
     fclose(ptrMed);
     fclose(ptrTemp);
-    remove("medicamentos.bin");
-    rename("temp.bin", "medicamentos.bin");
+    remove("medicamentos.bin"); //Exclui o arquivo obsoleto
+    rename("temp.bin", "medicamentos.bin"); //Transforma o arquivo temporário atualizado no arquivo principal
 
     if(encontrado == 0) {
         printf("Medicamento nao encontrado\n\n");
@@ -266,14 +288,14 @@ FILE* excluirFuncionario(FILE* fp) {
             printf("Funcionario excluido\n\n");
         }
         else {
-            fwrite(&func, sizeof(func), 1, ptrTemp);
+            fwrite(&func, sizeof(func), 1, ptrTemp); //Copia os dados do arquivo principal para o temporário sem o funcionário excluído
         }
     }
 
     fclose(fp);
     fclose(ptrTemp);
-    remove("funcionarios.bin");
-    rename("temp.bin", "funcionarios.bin");
+    remove("funcionarios.bin"); //Exclui o arquivo obsoleto
+    rename("temp.bin", "funcionarios.bin"); //Transforma o arquivo temporário atualizado no arquivo principal
 
     if (encontrado == 0) {
         printf("Funcionario nao encontrado\n\n");
@@ -306,24 +328,21 @@ FILE* excluirCliente(FILE* fp) {
             printf("Cliente excluido\n\n");
         }
         else {
-            fwrite(&cli, sizeof(cli), 1, ptrTemp);
+            fwrite(&cli, sizeof(cli), 1, ptrTemp); //Copia os dados do arquivo principal para o temporário sem o cliente excluído
         }
     }
 
     fclose(fp);
     fclose(ptrTemp);
-    remove("clientes.bin");
-    rename("temp.bin", "clientes.bin");
+    remove("clientes.bin"); //Exclui o arquivo obsoleto
+    rename("temp.bin", "clientes.bin"); //Transforma o arquivo temporário atualizado no arquivo principal
 
     if (encontrado == 0) {
         printf("Cliente nao encontrado\n\n");
     }
-
-    fclose(fp);
 }
 
 FILE* excluirMedicamento(FILE* fp) {
-
     struct medicamento med;
     fp = fopen("medicamentos.bin", "rb");
     if (fp == NULL) {
@@ -349,22 +368,21 @@ FILE* excluirMedicamento(FILE* fp) {
             printf("Medicamento excluido\n\n");
         }
         else {
-            fwrite(&med, sizeof(med), 1, ptrTemp);
+            fwrite(&med, sizeof(med), 1, ptrTemp); //Copia os dados do arquivo principal para o temporário sem o medicamento excluído
         }
     }
 
     fclose(fp);
     fclose(ptrTemp);
-    remove("medicamentos.bin");
-    rename("temp.bin", "medicamentos.bin");
+    remove("medicamentos.bin"); //Exclui o arquivo obsoleto
+    rename("temp.bin", "medicamentos.bin"); //Transforma o arquivo temporário atualizado no arquivo principal
 
     if (encontrado == 0) {
         printf("Medicamento nao encontrado\n\n");
     }
-
-    fclose(fp);
 }
 
+//Lista todos os funcionários cadastrados no sistema
 void listarFuncionario(FILE* fp) {
     struct funcionario func;
     fp = fopen("funcionarios.bin", "rb");
@@ -397,6 +415,7 @@ void listarFuncionario(FILE* fp) {
     fclose(fp);
 }
 
+//Lista todos os clientes cadastrados no sistema
 void listarCliente(FILE* fp) {
     struct cliente cli;
     fp = fopen("clientes.bin", "rb");
@@ -427,6 +446,7 @@ void listarCliente(FILE* fp) {
     fclose(fp);
 }
 
+//Lista todos os medicamentos cadastrados no sistema
 void listarMedicamento(FILE* fp) {
     struct medicamento med;
     fp = fopen("medicamentos.bin", "rb");
@@ -458,6 +478,7 @@ void listarMedicamento(FILE* fp) {
     fclose(fp);
 }
 
+//Função recursiva que roda até o usuário digitar '0' para sair
 int menu() {
     FILE* fp;
     int opcao;
