@@ -40,7 +40,7 @@ struct venda{
     float valorTotal;
 };
 
-/* Prototipos de funçõs do sistema farmacia*/
+/* Protótipos de funções do sistema farmácia*/
 void cadastrarFuncionario(FILE* fp);
 void cadastrarCliente(FILE* fp);
 void cadastrarMedicamento(FILE* fp);
