@@ -1,4 +1,5 @@
-#include "farmacia.h" 
+#include "farmacia.h"
+
 
 void cadastrarFuncionario(FILE* fp) {
     struct funcionario *func;
@@ -224,22 +225,6 @@ void relatorioVendas(FILE* fp) {
 
     fclose(fp);
 }
-void relatorioEstoque(FILE* fp) {
-    struct medicamento med;
-    fp = fopen("medicamentos.bin", "rb");
-    if (fp == NULL) {
-        printf("Erro ao abrir arquivo\n\n");
-        return;
-    }
-
-    printf("\t\tRELATORIO DE ESTOQUE\n\n");
-
-    while(fread(&med, sizeof(med), 1, fp) == 1) {
-        printf("ID do medicamento: %d\nNome do medicamento: %s\nNome do fabricante: %s\nDosagem: %f\nPreco: %f\nQuantidade: %d\n\n", med.id, med.nome, med.fabricante, med.dosagem, med.preco, med.quantidade);
-    }
-
-    fclose(fp);
-}
 FILE* excluirFuncionario(FILE* fp) {
     struct funcionario func;
     fp = fopen("funcionarios.bin", "rb");
@@ -408,7 +393,7 @@ void listarCliente(FILE* fp) {
     }
     fclose(fp);
 }
-void listarMedicamento(FILE* fp) {
+void listarEstoque(FILE* fp) {
     struct medicamento med;
     fp = fopen("medicamentos.bin", "rb");
     if (fp == NULL) {
@@ -667,16 +652,15 @@ int menu() {
     printf("3. Cadastrar medicamento\n");
     printf("4. Registrar venda\n");
     printf("5. Gerar relatorio de vendas\n");
-    printf("6. Gerar relatorio de estoque\n");
-    printf("7. Excluir funcionario\n");
-    printf("8. Excluir cliente\n");
-    printf("9. Excluir medicamento\n");
-    printf("10. Listar funcionarios\n");
-    printf("11. Listar clientes\n");
-    printf("12. Listar medicamentos\n");
-    printf("13. Atualizar funcionario\n");
-    printf("14. Atualizar cliente\n");
-    printf("15. Atualizar medicamento\n");
+    printf("6. Excluir funcionario\n");
+    printf("7. Excluir cliente\n");
+    printf("8. Excluir medicamento\n");
+    printf("9. Listar funcionarios\n");
+    printf("10. Listar clientes\n");
+    printf("11. Listar medicamentos\n");
+    printf("12. Atualizar funcionario\n");
+    printf("13. Atualizar cliente\n");
+    printf("14. Atualizar medicamento\n");
     printf("0. Sair\n\n");
     scanf("%d", &opcao);
 
@@ -697,33 +681,30 @@ int menu() {
             relatorioVendas(fp);
             break;
         case 6:
-            relatorioEstoque(fp);
-            break;
-        case 7:
             excluirFuncionario(fp);
             break;
-        case 8:
+        case 7:
             excluirCliente(fp);
             break;
-        case 9:
+        case 8:
             excluirMedicamento(fp);
             break;
-        case 10:
+        case 9:
             listarFuncionario(fp);
             break;
-        case 11:
+        case 10:
             listarCliente(fp);
             break;
-        case 12:
-            listarMedicamento(fp);
+        case 11:
+            listarEstoque(fp);
             break;
-        case 13:
+        case 12:
             atualizarFuncionario(fp);
             break;
-        case 14:
+        case 13:
             atualizarCliente(fp);
             break;
-        case 15:
+        case 14:
             atualizarMedicamento(fp);
             break;
         case 0:

@@ -47,7 +47,6 @@ void cadastrarMedicamento(FILE* fp);
 
 void registrarVendas(FILE* fp);
 void relatorioVendas(FILE* fp);
-void relatorioEstoque(FILE* fp);
 
 FILE* excluirFuncionario(FILE* fp);
 FILE* excluirCliente(FILE* fp);
@@ -55,7 +54,7 @@ FILE* excluirMedicamento(FILE* fp);
 
 void listarFuncionario(FILE* fp);
 void listarCliente(FILE* fp);
-void listarMedicamento(FILE* fp);
+void listarEstoque(FILE* fp);
 
 FILE* atualizarFuncionario(FILE* fp);
 FILE* atualizarCliente(FILE* fp);
