@@ -408,33 +408,6 @@ void listarCliente(FILE* fp) {
     }
     fclose(fp);
 }
-void listarMedicamento(FILE* fp) {
-    struct medicamento med;
-    fp = fopen("medicamentos.bin", "rb");
-    if (fp == NULL) {
-        printf("Erro ao abrir arquivo\n\n");
-        return;
-    }
-    int contador = 0;
-
-    printf("\t\tLISTA DE MEDICAMENTOS\n\n");
-
-    while(fread(&med, sizeof(med), 1, fp) == 1) {
-        printf("---------------------------------------------------------------------------\n");
-        printf("ID: %d\n", med.id);
-        printf("Nome: %s\n", med.nome);
-        printf("Fabricante: %s\n", med.fabricante);
-        printf("Dosagem: %.2fmg\n", med.dosagem);
-        printf("Preco: %.2f\n", med.preco);
-        printf("Quantidade: %d\n", med.quantidade);
-        printf("---------------------------------------------------------------------------\n\n");
-        contador++;
-    }
-    if (contador == 0) {
-        printf("Nao ha medicamentos para exibir\n\n");
-    }
-    fclose(fp);
-}
 FILE* atualizarFuncionario(FILE* fp) {
     FILE* ptrTemp;
     int idBusca;
@@ -673,10 +646,9 @@ int menu() {
     printf("9. Excluir medicamento\n");
     printf("10. Listar funcionarios\n");
     printf("11. Listar clientes\n");
-    printf("12. Listar medicamentos\n");
-    printf("13. Atualizar funcionario\n");
-    printf("14. Atualizar cliente\n");
-    printf("15. Atualizar medicamento\n");
+    printf("12. Atualizar funcionario\n");
+    printf("13. Atualizar cliente\n");
+    printf("14. Atualizar medicamento\n");
     printf("0. Sair\n\n");
     scanf("%d", &opcao);
 
@@ -715,15 +687,12 @@ int menu() {
             listarCliente(fp);
             break;
         case 12:
-            listarMedicamento(fp);
-            break;
-        case 13:
             atualizarFuncionario(fp);
             break;
-        case 14:
+        case 13:
             atualizarCliente(fp);
             break;
-        case 15:
+        case 14:
             atualizarMedicamento(fp);
             break;
         case 0:
