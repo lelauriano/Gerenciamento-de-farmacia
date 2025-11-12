@@ -55,7 +55,6 @@ FILE* excluirMedicamento(FILE* fp);
 
 void listarFuncionario(FILE* fp);
 void listarCliente(FILE* fp);
-void listarMedicamento(FILE* fp);
 
 FILE* atualizarFuncionario(FILE* fp);
 FILE* atualizarCliente(FILE* fp);
