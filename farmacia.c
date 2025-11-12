@@ -1,88 +1,61 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-/*Sistema de Administração de Farmácia*/
-struct cliente{
-    int id;
-    char nome[50];
-    char cpf[14];
-    char telefone[12];
-    char alergias[80];
-};
-
-struct funcionario{
-    int id;
-    char nome[50];
-    char cpf[14];
-    float salario;
-    char endereco[50];
-    char telefone[12];
-    char email[50];
-};
-
-struct medicamento{
-    int id;
-    char nome[30];
-    char fabricante[30];
-    float dosagem;
-    float preco;
-    int quantidade;
-};
-
-struct venda{
-    int idCliente;
-    int idMed;
-    int quantidade;
-    float valorTotal;
-};
+#include "farmacia.h" 
 
 void cadastrarFuncionario(FILE* fp) {
-    struct funcionario func;
+    struct funcionario *func;
+    func = (struct funcionario*) malloc(sizeof(struct funcionario));
+    
+    if (func == NULL) {
+        printf("Erro de alocacao de memoria\n\n");
+        return;
+    }
+
     fp = fopen("funcionarios.bin", "ab");
     if (fp == NULL) {
         printf("Erro ao abrir arquivo\n\n");
+        free(func); 
         return;
     }
 
     printf("\t\tCADASTRO DE FUNCIONARIO\n\n");
 
     printf("Digite o ID:\n");
-    scanf("%d", &func.id);
-    getchar();                                  //Limpa o buffer do scanf
+    scanf("%d", &func->id);
+    getchar(); 
 
     printf("Digite o nome:\n");
-    fgets(func.nome, 50, stdin);
-    func.nome[strcspn(func.nome, "\n")] = 0;    //Limpa o buffer do fgets
+    fgets(func->nome, 50, stdin);
+    func->nome[strcspn(func->nome, "\n")] = 0;
 
     printf("Digite o CPF:\n");
-    fgets(func.cpf, 50, stdin);
-    func.cpf[strcspn(func.cpf, "\n")] = 0;
+    fgets(func->cpf, 14, stdin);
+    func->cpf[strcspn(func->cpf, "\n")] = 0;
 
     printf("Digite o salario:\n");
-    scanf("%f", &func.salario);
+    scanf("%f", &func->salario);
     getchar();
 
     printf("Digite o endereco:\n");
-    fgets(func.endereco, 50, stdin);
-    func.endereco[strcspn(func.endereco, "\n")] = 0;
+    fgets(func->endereco, 50, stdin);
+    func->endereco[strcspn(func->endereco, "\n")] = 0;
 
     printf("Digite o telefone:\n");
-    fgets(func.telefone, 50, stdin);
-    func.telefone[strcspn(func.telefone, "\n")] = 0;
+    fgets(func->telefone, 12, stdin); 
+    func->telefone[strcspn(func->telefone, "\n")] = 0;
 
     printf("Digite o e-mail:\n");
-    fgets(func.email, 50, stdin);
-    func.email[strcspn(func.email, "\n")] = 0;
+    fgets(func->email, 50, stdin);
+    func->email[strcspn(func->email, "\n")] = 0;
 
-    fwrite(&func, sizeof(func), 1, fp);
+    //passa o ponteiro (que contém o endereço) para o fwrite
+    fwrite(func, sizeof(struct funcionario), 1, fp);
     fclose(fp);
+
+    free(func);
 
     printf("\nCadastro realizado com sucesso\n\n");
 }
-
 void cadastrarCliente(FILE* fp) {
-    struct cliente cli;
+    struct cliente cli; 
     fp = fopen("clientes.bin", "ab");
     if (fp == NULL) {
         printf("Erro ao abrir arquivo\n\n");
@@ -104,7 +77,7 @@ void cadastrarCliente(FILE* fp) {
     cli.cpf[strcspn(cli.cpf, "\n")] = 0;
 
     printf("Digite o telefone:\n");
-    fgets(cli.telefone, 50, stdin);
+    fgets(cli.telefone, 50, stdin); 
     cli.telefone[strcspn(cli.telefone, "\n")] = 0;
 
     printf("Digite a(s) alergia(s):\n");
@@ -118,7 +91,7 @@ void cadastrarCliente(FILE* fp) {
 }
 
 void cadastrarMedicamento(FILE* fp) {
-    struct medicamento med;
+    struct medicamento med; 
     fp = fopen("medicamentos.bin", "ab");
     if (fp == NULL) {
         printf("Erro ao abrir arquivo\n");
@@ -187,6 +160,7 @@ void registrarVendas(FILE* fp) {
     ptrMed = fopen("medicamentos.bin", "rb");
     if(ptrMed == NULL) {
         printf("Erro ao abrir arquivo de medicamentos\n");
+        fclose(fp); 
         return;
     }
 
@@ -194,6 +168,8 @@ void registrarVendas(FILE* fp) {
     ptrTemp = fopen("temp.bin", "wb");
     if(ptrTemp == NULL) {
         printf("Erro ao abrir arquivo temporario\n\n");
+        fclose(fp);
+        fclose(ptrMed);
         return;
     }
 
@@ -206,12 +182,16 @@ void registrarVendas(FILE* fp) {
             }
             else {
                 printf("Estoque insuficiente\n");
+                fclose(fp);
+                fclose(ptrMed);
+                fclose(ptrTemp);
+                remove("temp.bin"); // Remove o temporário inútil
                 return;
             }
         }
-        fwrite(&med, sizeof(med), 1, ptrTemp); //Copia os dados do arquivo principal para o temporário com a quantidade de medicamentos atualizada
+        fwrite(&med, sizeof(med), 1, ptrTemp);//Copia os dados do arquivo principal para o temporário com a quantidade de medicamentos atualizada
+    
     }
-
     fclose(ptrMed);
     fclose(ptrTemp);
     remove("medicamentos.bin"); //Exclui o arquivo obsoleto
@@ -219,6 +199,7 @@ void registrarVendas(FILE* fp) {
 
     if(encontrado == 0) {
         printf("Medicamento nao encontrado\n\n");
+        fclose(fp); 
         return;
     }
 
@@ -227,7 +208,6 @@ void registrarVendas(FILE* fp) {
 
     printf("\nVenda registrada com sucesso\n\n");
 }
-
 void relatorioVendas(FILE* fp) {
     struct venda ven;
     fp = fopen("registro_vendas.bin", "rb");
@@ -244,7 +224,6 @@ void relatorioVendas(FILE* fp) {
 
     fclose(fp);
 }
-
 void relatorioEstoque(FILE* fp) {
     struct medicamento med;
     fp = fopen("medicamentos.bin", "rb");
@@ -261,7 +240,6 @@ void relatorioEstoque(FILE* fp) {
 
     fclose(fp);
 }
-
 FILE* excluirFuncionario(FILE* fp) {
     struct funcionario func;
     fp = fopen("funcionarios.bin", "rb");
@@ -269,16 +247,15 @@ FILE* excluirFuncionario(FILE* fp) {
         printf("Erro ao abrir arquivo");
         return NULL;
     }
-
     int idBusca;
     int encontrado = 0;
     FILE* ptrTemp;
     ptrTemp = fopen("temp.bin", "wb");
     if (ptrTemp == NULL) {
         printf("Erro ao abrir arquivo temporario\n\n");
+        fclose(fp); 
         return NULL;
     }
-
     printf("Digite o ID do funcionario a ser removido do sistema:\n");
     scanf("%d", &idBusca);
 
@@ -288,20 +265,19 @@ FILE* excluirFuncionario(FILE* fp) {
             printf("Funcionario excluido\n\n");
         }
         else {
-            fwrite(&func, sizeof(func), 1, ptrTemp); //Copia os dados do arquivo principal para o temporário sem o funcionário excluído
+            fwrite(&func, sizeof(func), 1, ptrTemp); 
         }
     }
-
     fclose(fp);
     fclose(ptrTemp);
-    remove("funcionarios.bin"); //Exclui o arquivo obsoleto
-    rename("temp.bin", "funcionarios.bin"); //Transforma o arquivo temporário atualizado no arquivo principal
+    remove("funcionarios.bin"); 
+    rename("temp.bin", "funcionarios.bin"); 
 
     if (encontrado == 0) {
         printf("Funcionario nao encontrado\n\n");
     }
+    return NULL; // O retorno não é usado no menu, mas mantido
 }
-
 FILE* excluirCliente(FILE* fp) {
     struct cliente cli;
     fp = fopen("clientes.bin", "rb");
@@ -309,16 +285,15 @@ FILE* excluirCliente(FILE* fp) {
         printf("Erro ao abrir arquivo\n\n");
         return NULL;
     }
-
     int idBusca;
     int encontrado = 0;
     FILE* ptrTemp;
     ptrTemp = fopen("temp.bin", "wb");
     if (ptrTemp == NULL) {
         printf("Erro ao abrir arquivo temporario\n\n");
+        fclose(fp);
         return NULL;
     }
-
     printf("Digite o ID do cliente a ser removido do sistema:\n");
     scanf("%d", &idBusca);
 
@@ -328,20 +303,19 @@ FILE* excluirCliente(FILE* fp) {
             printf("Cliente excluido\n\n");
         }
         else {
-            fwrite(&cli, sizeof(cli), 1, ptrTemp); //Copia os dados do arquivo principal para o temporário sem o cliente excluído
+            fwrite(&cli, sizeof(cli), 1, ptrTemp); 
         }
     }
-
     fclose(fp);
     fclose(ptrTemp);
-    remove("clientes.bin"); //Exclui o arquivo obsoleto
-    rename("temp.bin", "clientes.bin"); //Transforma o arquivo temporário atualizado no arquivo principal
+    remove("clientes.bin"); 
+    rename("temp.bin", "clientes.bin"); 
 
     if (encontrado == 0) {
         printf("Cliente nao encontrado\n\n");
     }
+    return NULL;
 }
-
 FILE* excluirMedicamento(FILE* fp) {
     struct medicamento med;
     fp = fopen("medicamentos.bin", "rb");
@@ -349,16 +323,15 @@ FILE* excluirMedicamento(FILE* fp) {
         printf("Erro ao abrir arquivo\n\n");
         return NULL;
     }
-
     int idBusca;
     int encontrado = 0;
     FILE* ptrTemp;
     ptrTemp = fopen("temp.bin", "wb");
     if (ptrTemp == NULL) {
         printf("Erro ao abrir arquivo temporario\n\n");
+        fclose(fp);
         return NULL;
     }
-
     printf("Digite o ID do medicamento a ser removido do sistema:\n");
     scanf("%d", &idBusca);
 
@@ -368,21 +341,19 @@ FILE* excluirMedicamento(FILE* fp) {
             printf("Medicamento excluido\n\n");
         }
         else {
-            fwrite(&med, sizeof(med), 1, ptrTemp); //Copia os dados do arquivo principal para o temporário sem o medicamento excluído
+            fwrite(&med, sizeof(med), 1, ptrTemp); 
         }
     }
-
     fclose(fp);
     fclose(ptrTemp);
-    remove("medicamentos.bin"); //Exclui o arquivo obsoleto
-    rename("temp.bin", "medicamentos.bin"); //Transforma o arquivo temporário atualizado no arquivo principal
+    remove("medicamentos.bin"); 
+    rename("temp.bin", "medicamentos.bin"); 
 
     if (encontrado == 0) {
         printf("Medicamento nao encontrado\n\n");
     }
+    return NULL;
 }
-
-//Lista todos os funcionários cadastrados no sistema
 void listarFuncionario(FILE* fp) {
     struct funcionario func;
     fp = fopen("funcionarios.bin", "rb");
@@ -390,7 +361,6 @@ void listarFuncionario(FILE* fp) {
         printf("Erro ao abrir arquivo\n\n");
         return;
     }
-
     int contador = 0;
 
     printf("\t\tLISTA DE FUNCIONARIOS\n\n");
@@ -407,15 +377,11 @@ void listarFuncionario(FILE* fp) {
         printf("---------------------------------------------------------------------------\n\n");
         contador++;
     }
-
     if (contador == 0) {
         printf("Nao ha funcionarios para exibir\n\n");
     }
-
     fclose(fp);
 }
-
-//Lista todos os clientes cadastrados no sistema
 void listarCliente(FILE* fp) {
     struct cliente cli;
     fp = fopen("clientes.bin", "rb");
@@ -423,7 +389,6 @@ void listarCliente(FILE* fp) {
         printf("Erro ao abrir arquivo\n\n");
         return;
     }
-
     int contador = 0;
 
     printf("\t\tLISTA DE CLIENTES\n\n");
@@ -438,15 +403,11 @@ void listarCliente(FILE* fp) {
         printf("---------------------------------------------------------------------------\n\n");
         contador++;
     }
-
     if (contador == 0) {
         printf("Nao ha clientes para exibir\n\n");
     }
-
     fclose(fp);
 }
-
-//Lista todos os medicamentos cadastrados no sistema
 void listarMedicamento(FILE* fp) {
     struct medicamento med;
     fp = fopen("medicamentos.bin", "rb");
@@ -454,7 +415,6 @@ void listarMedicamento(FILE* fp) {
         printf("Erro ao abrir arquivo\n\n");
         return;
     }
-
     int contador = 0;
 
     printf("\t\tLISTA DE MEDICAMENTOS\n\n");
@@ -470,17 +430,234 @@ void listarMedicamento(FILE* fp) {
         printf("---------------------------------------------------------------------------\n\n");
         contador++;
     }
-
     if (contador == 0) {
         printf("Nao ha medicamentos para exibir\n\n");
     }
-
     fclose(fp);
 }
+FILE* atualizarFuncionario(FILE* fp) {
+    FILE* ptrTemp;
+    int idBusca;
+    int encontrado = 0;
 
-//Função recursiva que roda até o usuário digitar '0' para sair
+    struct funcionario *func;
+    func = (struct funcionario*) malloc(sizeof(struct funcionario));
+    if (func == NULL) {
+        printf("Erro de alocacao de memoria\n\n");
+        return NULL;
+    }
+
+    fp = fopen("funcionarios.bin", "rb");
+    if (fp == NULL) {
+        printf("Erro ao abrir arquivo\n\n");
+        free(func); 
+        return NULL;
+    }
+
+    ptrTemp = fopen("temp.bin", "wb");
+    if (ptrTemp == NULL) {
+        printf("Erro ao abrir arquivo temporario\n\n");
+        fclose(fp);
+        free(func); 
+        return NULL;
+    }
+
+    printf("\t\tATUALIZAR FUNCIONARIO\n\n");
+    printf("Digite o ID do funcionario a ser atualizado:\n");
+    scanf("%d", &idBusca);
+    getchar(); // Limpa o buffer
+
+    while (fread(func, sizeof(struct funcionario), 1, fp) == 1) {
+        if (func->id == idBusca) {
+            encontrado = 1;
+            printf("Funcionario encontrado. Digite os novos dados:\n\n");
+
+            printf("Digite o novo nome:\n");
+            fgets(func->nome, 50, stdin);
+            func->nome[strcspn(func->nome, "\n")] = 0;
+
+            printf("Digite o novo CPF:\n");
+            fgets(func->cpf, 50, stdin);
+            func->cpf[strcspn(func->cpf, "\n")] = 0;
+
+            printf("Digite o novo salario:\n");
+            scanf("%f", &func->salario);
+            getchar();
+
+            printf("Digite o novo endereco:\n");
+            fgets(func->endereco, 50, stdin);
+            func->endereco[strcspn(func->endereco, "\n")] = 0;
+
+            printf("Digite o novo telefone:\n");
+            fgets(func->telefone, 50, stdin);
+            func->telefone[strcspn(func->telefone, "\n")] = 0;
+
+            printf("Digite o novo e-mail:\n");
+            fgets(func->email, 50, stdin);
+            func->email[strcspn(func->email, "\n")] = 0;
+        }
+        fwrite(func, sizeof(struct funcionario), 1, ptrTemp);
+    }
+    fclose(fp);
+    fclose(ptrTemp);
+    free(func);
+
+    remove("funcionarios.bin");
+    rename("temp.bin", "funcionarios.bin");
+
+    if (encontrado == 0) {
+        printf("Funcionario nao encontrado\n\n");
+    } else {
+        printf("\nFuncionario atualizado com sucesso!\n\n");
+    }
+    return NULL;
+}
+FILE* atualizarCliente(FILE* fp) {
+    FILE* ptrTemp;
+    int idBusca;
+    int encontrado = 0;
+
+    struct cliente *cli;
+    cli = (struct cliente*) malloc(sizeof(struct cliente));
+    if (cli == NULL) {
+        printf("Erro de alocacao de memoria\n\n");
+        return NULL;
+    }
+
+    fp = fopen("clientes.bin", "rb");
+    if (fp == NULL) {
+        printf("Erro ao abrir arquivo\n\n");
+        free(cli);
+        return NULL;
+    }
+
+    ptrTemp = fopen("temp.bin", "wb");
+    if (ptrTemp == NULL) {
+        printf("Erro ao abrir arquivo temporario\n\n");
+        fclose(fp);
+        free(cli);
+        return NULL;
+    }
+
+    printf("\t\tATUALIZAR CLIENTE\n\n");
+    printf("Digite o ID do cliente a ser atualizado:\n");
+    scanf("%d", &idBusca);
+    getchar(); // Limpa o buffer
+
+    while (fread(cli, sizeof(struct cliente), 1, fp) == 1) {
+        if (cli->id == idBusca) {
+            encontrado = 1;
+            printf("Cliente encontrado. Digite os novos dados:\n\n");
+
+            printf("Digite o novo nome:\n");
+            fgets(cli->nome, 50, stdin);
+            cli->nome[strcspn(cli->nome, "\n")] = 0;
+
+            printf("Digite o novo CPF:\n");
+            fgets(cli->cpf, 14, stdin);
+            cli->cpf[strcspn(cli->cpf, "\n")] = 0;
+
+            printf("Digite o novo telefone:\n");
+            fgets(cli->telefone, 50, stdin);
+            cli->telefone[strcspn(cli->telefone, "\n")] = 0;
+
+            printf("Digite a(s) nova(s) alergia(s):\n");
+            fgets(cli->alergias, 80, stdin);
+            cli->alergias[strcspn(cli->alergias, "\n")] = 0;
+        }
+        fwrite(cli, sizeof(struct cliente), 1, ptrTemp);
+    }
+    fclose(fp);
+    fclose(ptrTemp);
+    free(cli); 
+
+    remove("clientes.bin");
+    rename("temp.bin", "clientes.bin");
+
+    if (encontrado == 0) {
+        printf("Cliente nao encontrado\n\n");
+    } else {
+        printf("\nCliente atualizado com sucesso!\n\n");
+    }
+    return NULL;
+}
+FILE* atualizarMedicamento(FILE* fp) {
+    FILE* ptrTemp;
+    int idBusca;
+    int encontrado = 0;
+
+    struct medicamento *med;
+    med = (struct medicamento*) malloc(sizeof(struct medicamento));
+    if (med == NULL) {
+        printf("Erro de alocacao de memoria\n\n");
+        return NULL;
+    }
+
+    fp = fopen("medicamentos.bin", "rb");
+    if (fp == NULL) {
+        printf("Erro ao abrir arquivo\n\n");
+        free(med);
+        return NULL;
+    }
+
+    ptrTemp = fopen("temp.bin", "wb");
+    if (ptrTemp == NULL) {
+        printf("Erro ao abrir arquivo temporario\n\n");
+        fclose(fp);
+        free(med);
+        return NULL;
+    }
+
+    printf("\t\tATUALIZAR MEDICAMENTO\n\n");
+    printf("Digite o ID do medicamento a ser atualizado:\n");
+    scanf("%d", &idBusca);
+    getchar(); // Limpa o buffer
+
+    while (fread(med, sizeof(struct medicamento), 1, fp) == 1) {
+        if (med->id == idBusca) {
+            encontrado = 1;
+            printf("Medicamento encontrado. Digite os novos dados:\n\n");
+
+            printf("Digite o novo nome:\n");
+            fgets(med->nome, 30, stdin);
+            med->nome[strcspn(med->nome, "\n")] = 0;
+
+            printf("Digite o novo fabricante:\n");
+            fgets(med->fabricante, 30, stdin);
+            med->fabricante[strcspn(med->fabricante, "\n")] = 0;
+
+            printf("Digite a nova dosagem:\n");
+            scanf("%f", &med->dosagem);
+            getchar();
+
+            printf("Digite o novo preco:\n");
+            scanf("%f", &med->preco);
+            getchar();
+
+            printf("Digite a nova quantidade:\n");
+            scanf("%d", &med->quantidade);
+            getchar();
+        }
+        fwrite(med, sizeof(struct medicamento), 1, ptrTemp);
+    }
+    fclose(fp);
+    fclose(ptrTemp);
+    free(med); 
+
+    remove("medicamentos.bin");
+    rename("temp.bin", "medicamentos.bin");
+
+    if (encontrado == 0) {
+        printf("Medicamento nao encontrado\n\n");
+    } else {
+        printf("\nMedicamento atualizado com sucesso!\n\n");
+    }
+    return NULL;
+}
+
 int menu() {
-    FILE* fp;
+   
+    FILE* fp; 
     int opcao;
 
     printf("\n\t\t==== SISTEMA DE GERENCIAMENTO DE FARMACIA ====\n\n");
@@ -497,6 +674,9 @@ int menu() {
     printf("10. Listar funcionarios\n");
     printf("11. Listar clientes\n");
     printf("12. Listar medicamentos\n");
+    printf("13. Atualizar funcionario\n");
+    printf("14. Atualizar cliente\n");
+    printf("15. Atualizar medicamento\n");
     printf("0. Sair\n\n");
     scanf("%d", &opcao);
 
@@ -537,6 +717,15 @@ int menu() {
         case 12:
             listarMedicamento(fp);
             break;
+        case 13:
+            atualizarFuncionario(fp);
+            break;
+        case 14:
+            atualizarCliente(fp);
+            break;
+        case 15:
+            atualizarMedicamento(fp);
+            break;
         case 0:
             printf("\nSaindo...\n\n");
             return 0;
@@ -544,15 +733,7 @@ int menu() {
             printf("\nOpcao invalida\n\n");
     }
 
-    menu();
+    menu(); 
     
-    fclose(fp);
-    return 0;
-}
-
-int main () {
-
-    menu();
-
     return 0;
 }
