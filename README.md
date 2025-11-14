@@ -1,35 +1,24 @@
 # Sistema de Gerenciamento de Farmácia 💊
 
-Este é um projeto simples em C para gerenciar, cadastar, excluir, atualizar e listar clientes, funcionários, medicamentos e vendas de uma farmácia.
+Este é um projeto simples em C para gerenciar, cadastrar, excluir, atualizar e listar clientes, funcionários, medicamentos e vendas de uma farmácia.
 
-## 🛠️ Como Compilar
+## Como Compilar
 
 Este projeto é dividido em múltiplos arquivos e precisa ser compilado.
 
 **Dependências:**
 * Um compilador C (como o **GCC**)
-* O utilitário Make (opcional, mas recomendado)
 
-Método 1: Usando Make (Recomendado)
+Método: Usando GCC
 
-Se você tiver o make instalado, basta executar o comando make no seu terminal:
-
-make
-
-
-O Makefile incluído no projeto cuidará de compilar tudo automaticamente.
-
-Método 2: Usando GCC Manualmente
-
-Se você não tiver o make, pode compilar todos os arquivos-fonte manualmente com o GCC:
+Para compilar os arquivos manualmente usando o GCC, execute o seguinte comando no terminal:
 
 gcc main.c farmacia.c -o programa_farmacia
 
+## Como Executar:
 
-Como Executar:
+Após a compilação, um arquivo executável chamado programa_farmacia (ou programa_farmacia.exe no Windows) será criado.
 
-Após a compilação (usando qualquer um dos métodos), um arquivo executável chamado programa_farmacia (ou programa_farmacia.exe no Windows) será criado.
+Para executá-lo, execute o seguinte comando no terminal:
 
-Para executá-lo:
-# No Windows (PowerShell)
 ./programa_farmacia.exe
